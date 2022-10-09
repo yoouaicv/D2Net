@@ -20,8 +20,8 @@ from engine import train_one_epoch, evaluate
 
 from utils import NativeScalerWithGradNormCount as NativeScaler
 import utils
-import models.model
 
+import models.D2Net
 from sampler import MultiScaleSamplerDDP
 from fvcore.nn import FlopCountAnalysis
 
@@ -46,13 +46,13 @@ def get_args_parser():
     parser.add_argument('--batch_size', default=256, type=int,
                         help='Per GPU batch size')
     parser.add_argument('--epochs', default=300, type=int)
-    parser.add_argument('--update_freq', default=2, type=int,
+    parser.add_argument('--update_freq', default=1, type=int,
                         help='gradient accumulation steps')
 
     # Model parameters
-    parser.add_argument('--model', default='edgenext_small', type=str, metavar='MODEL',
+    parser.add_argument('--model', default='D2Net_xxs', type=str, metavar='MODEL',
                         help='Name of model to train')
-    parser.add_argument('--drop_path', type=float, default=0.1, metavar='PCT',
+    parser.add_argument('--drop_path', type=float, default=0.0, metavar='PCT',
                         help='Drop path rate (default: 0.0)')
     parser.add_argument('--input_size', default=256, type=int,
                         help='image input size')
@@ -60,10 +60,10 @@ def get_args_parser():
                         help="Layer scale initial values")
 
     # EMA related parameters
-    parser.add_argument('--model_ema', type=str2bool, default=False)
-    parser.add_argument('--model_ema_decay', type=float, default=0.9995, help='')  # TODO: MobileViT is using 0.9995
+    parser.add_argument('--model_ema', type=str2bool, default=True)
+    parser.add_argument('--model_ema_decay', type=float, default=0.9999, help='')  # TODO: MobileViT is using 0.9995
     parser.add_argument('--model_ema_force_cpu', type=str2bool, default=False, help='')
-    parser.add_argument('--model_ema_eval', type=str2bool, default=False, help='Using ema to eval during training.')
+    parser.add_argument('--model_ema_eval', type=str2bool, default=True, help='Using ema to eval during training.')
 
     # Optimization parameters
     parser.add_argument('--opt', default='adamw', type=str, metavar='OPTIMIZER', help='Optimizer (default: "adamw"')
@@ -107,7 +107,7 @@ def get_args_parser():
     parser.add_argument('--crop_pct', type=float, default=None)
 
     # * Random Erase params
-    parser.add_argument('--reprob', type=float, default=0.0, metavar='PCT',
+    parser.add_argument('--reprob', type=float, default=0.25, metavar='PCT',
                         help='Random erase prob (default: 0.0)')
     parser.add_argument('--remode', type=str, default='pixel',
                         help='Random erase mode (default: "pixel")')
@@ -131,7 +131,7 @@ def get_args_parser():
                         help='How to apply mixup/cutmix params. Per "batch", "pair", or "elem"')
 
     # Dataset parameters
-    parser.add_argument('--data_path', default='datasets/imagenet_full', type=str,
+    parser.add_argument('--data_path', default='/datasets/imagenet2012/', type=str,
                         help='dataset path (path to full imagenet)')
     parser.add_argument('--eval_data_path', default=None, type=str,
                         help='dataset path for evaluation')
@@ -282,7 +282,7 @@ def main(args):
     if dataset_val is not None:
         data_loader_val = torch.utils.data.DataLoader(
             dataset_val, sampler=sampler_val,
-            batch_size=int(1.5 * args.batch_size),
+            batch_size=int(args.batch_size),
             num_workers=args.num_workers,
             pin_memory=args.pin_mem,
             drop_last=False
@@ -306,8 +306,8 @@ def main(args):
         drop_path_rate=args.drop_path,
         layer_scale_init_value=args.layer_scale_init_value,
         head_init_scale=1.0,
-        input_res=args.input_size,
-        classifier_dropout=args.classifier_dropout,
+        # input_res=args.input_size,
+        # classifier_dropout=args.classifier_dropout,
     )
     model.to(device)
 
