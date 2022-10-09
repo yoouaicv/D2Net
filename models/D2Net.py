@@ -54,9 +54,9 @@ class DDConv(nn.Module):
         x = self.pwconv(x)
         return x
 class D2Block(nn.Module):
-    def __init__(self, dim, kernel_size, drop_path=0., layer_scale_init_value=1e-6):
+    def __init__(self, dim, drop_path=0., layer_scale_init_value=1e-6):
         super(D2Block, self).__init__()
-        self.attention = DDConv(dim, kernel_size=kernel_size)
+        self.attention = DDConv(dim)
         self.mlp = Mlp(dim)
         self.drop_path = DropPath(drop_path) if drop_path > 0. else nn.Identity()
 
@@ -167,15 +167,18 @@ class LayerNorm(nn.Module):
 def D2Net_xxs(pretrained=False, **kwargs):
     model = D2Net(depths=[2, 2, 6, 2], dims=[24, 48, 96, 192], **kwargs)
     # bs=1024 input_size=256 color_jitter=0.4 hf=0.5 droppath=0.0 epochs=300 lr=0.006 wd=0.05
+    if pretrained:
+        checkpoint = torch.hub.load_state_dict_from_url(url='../log/D2Net_xxs/D2Net_xxs.pth', map_location="cpu", check_hash=True)
+        model.load_state_dict(checkpoint["model"])
     return model
 
 @register_model
-def D2Net_xs(pretrained=False **kwargs):
+def D2Net_xs(pretrained=False, **kwargs):
     model = D2Net(depths=[2, 2, 6, 2], dims=[32, 64, 128, 256], **kwargs)
     return model
 
 @register_model
-def D2Net_s(pretrained=False **kwargs):
+def D2Net_s(pretrained=False, **kwargs):
     model = D2Net(depths=[2, 2, 6, 2], dims=[48, 96, 192, 384], **kwargs)
     return model
 
