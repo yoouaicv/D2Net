@@ -36,7 +36,7 @@ class Mlp(nn.Module):
 class DDConv(nn.Module):
     def __init__(self, dim):
         super(DDConv, self).__init__()
-        self.norm = LayerNorm(dim, eps=1e-6)
+        self.norm1 = LayerNorm(dim, eps=1e-6)
         self.act = nn.GELU()
         # self.dwconv = nn.Conv2d(dim, dim, kernel_size=7, padding=3, groups=dim)
         self.dwconv_3 = nn.Conv2d(dim, dim, kernel_size=3, padding=1, dilation=1, groups=dim)
@@ -44,7 +44,7 @@ class DDConv(nn.Module):
         self.dwconv_7 = nn.Conv2d(dim, dim, kernel_size=3, padding=3, dilation=3, groups=dim)
         self.pwconv = nn.Linear(dim, dim)
     def forward(self, x):
-        x = self.norm(x)
+        x = self.norm1(x)
         x = x.permute([0, 3, 1, 2])
         # x = self.dwconv(x)
         # x = torch.cat([self.dwconv_7(x), self.dwconv_5(x), self.dwconv_3(x)], dim=1)
@@ -168,7 +168,7 @@ def D2Net_xxs(pretrained=False, **kwargs):
     model = D2Net(depths=[2, 2, 6, 2], dims=[24, 48, 96, 192], **kwargs)
     # bs=1024 input_size=256 color_jitter=0.4 hf=0.5 droppath=0.0 epochs=300 lr=0.006 wd=0.05
     if pretrained:
-        checkpoint = torch.hub.load_state_dict_from_url(url='../log/D2Net_xxs/D2Net_xxs.pth', map_location="cpu", check_hash=True)
+        checkpoint = torch.load('./log/D2Net_xxs/D2Net_xxs.pth') # torch.hub.load_state_dict_from_url(url='./log/D2Net_xxs/D2Net_xxs.pth', map_location="cpu", check_hash=True)
         model.load_state_dict(checkpoint["model"])
     return model
 
