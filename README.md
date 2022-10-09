@@ -6,7 +6,7 @@
 
 ------
 
-## imagenet
+## ImageNet
 
 |      model       |   Date    | image size | #param | top-1 acc |
 | :--------------: | :-------: | :--------: | :----: | :-------: |
@@ -20,5 +20,8 @@
 
 
 
-## rs
+## RS
 
+## References
+
+Our code is based on [EdgeNeXt](https://github.com/mmaaz60/EdgeNeXt) and [ConvNeXt](https://github.com/facebookresearch/ConvNeXt) repository. We thank them for releasing their code.
