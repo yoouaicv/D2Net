@@ -22,6 +22,18 @@
 
 ## RS
 
+|       model       |    Dataset     |     Acc     |
+| :---------------: | :------------: | :---------: |
+|    mobilenetv2    | AID0.5/NWPU0.2 | 95.12/91.19 |
+| mobilenetv3_small | AID0.5/NWPU0.2 | 94.60/90.80 |
+|     D2Net_xxs     | AID0.5/NWPU0.2 | 95.15/90.85 |
+
+
+
+<!--AID 0.5 train:test 0.5:0.5 -->
+
+<!--NWPU0.2 train:test 0.2:0.8 -->
+
 ## References
 
 Our code is based on [EdgeNeXt](https://github.com/mmaaz60/EdgeNeXt) and [ConvNeXt](https://github.com/facebookresearch/ConvNeXt) repository. We thank them for releasing their code.
